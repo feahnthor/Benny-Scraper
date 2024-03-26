@@ -50,6 +50,7 @@ namespace Benny_Scraper.BusinessLogic.Scrapers.Strategy
             Logger.Info($"Starting scraper for {this.GetType().Name}");
 
             SetBaseUri(_scraperData.SiteTableOfContents);
+            await RetrieveCookiesUsingSelenium(_scraperData.SiteTableOfContents, true);
 
             var (htmlDocument, uri) = await LoadHtmlAsync(_scraperData.SiteTableOfContents);
             var novelDataBuffer = FetchNovelDataFromTableOfContents(htmlDocument);

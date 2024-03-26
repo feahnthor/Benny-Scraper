@@ -11,14 +11,13 @@ namespace Benny_Scraper.BusinessLogic.Factory
         Chrome,
         Firefox,
         Edge,
-        IE
+        Ie
     }
 
     public class DriverFactory : IDriverFactory
     {
-        private ConcurrentDictionary<int, IWebDriver> _drivers; // thread-safe version of the dictionary, no need to worry about multiple threads making changes
+        private readonly ConcurrentDictionary<int, IWebDriver> _drivers; // thread-safe version of the dictionary, no need to worry about multiple threads making changes
         private int _counter;
-
 
         public DriverFactory()
         {
@@ -53,7 +52,6 @@ namespace Benny_Scraper.BusinessLogic.Factory
                     _counter++;
                     return driver;
 
-
                 default:
                     // throwing resolves error since everything needs to return the correct type
                     throw new ArgumentException($"{browser} is not a valid value.");
@@ -67,11 +65,11 @@ namespace Benny_Scraper.BusinessLogic.Factory
         /// <param name="isHeadless"></param>
         /// <param name="url"></param>
         /// <returns></returns>
-        public async Task<IWebDriver> CreateDriverAsync(string url, int browser, bool isHeadless)
+        public async Task<IWebDriver> CreateDriverAsync(string url, Broswer browser, bool isHeadless)
         {
             switch (browser)
             {
-                case (int)Broswer.Chrome:
+                case Broswer.Chrome:
                     var chromeDriverService = ChromeDriverService.CreateDefaultService();
                     chromeDriverService.HideCommandPromptWindow = true;
                     new WebDriverManager.DriverManager().SetUpDriver(new ChromeConfig());

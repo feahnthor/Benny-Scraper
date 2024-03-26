@@ -255,6 +255,8 @@ namespace Benny_Scraper.BusinessLogic.Scrapers.Strategy
         private SemaphoreSlim _semaphoreSlim; // limit the number of concurrent requests, prevent posssible rate limiting
         private static readonly List<string> _userAgents = new List<string>
         {
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36",
             "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36",
@@ -297,6 +299,32 @@ namespace Benny_Scraper.BusinessLogic.Scrapers.Strategy
         public async Task<(HtmlDocument document, Uri updatedUri)> LoadHtmlPublicAsync(Uri uri)
         {
             return await LoadHtmlAsync(uri);
+        }
+
+        protected async Task RetrieveCookiesUsingSelenium(Uri uri, bool headless)
+        {
+            IDriverFactory driverFactory = new DriverFactory();
+            try
+            {
+                var driver = await driverFactory.CreateDriverAsync(uri.ToString(), Broswer.Chrome, headless); // may need to change this to have it detect browswers available
+                var cookies = driver.Manage().Cookies.AllCookies;
+                driverFactory.DisposeAllDrivers();
+                foreach (var cookie in cookies)
+                {
+                    _client.DefaultRequestHeaders.Add("Cookie", $"{cookie.Name}={cookie.Value}");
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"Error occurred while retrieving cookies using Selenium. {e}");
+                throw;
+            }
+            finally
+            {
+                Logger.Debug("Disposing all drivers");
+                driverFactory.DisposeAllDrivers();
+                Logger.Debug("Finished disposing all drivers");
+            }
         }
 
         protected static async Task<(HtmlDocument document, Uri updatedUri)> LoadHtmlAsync(Uri uri)

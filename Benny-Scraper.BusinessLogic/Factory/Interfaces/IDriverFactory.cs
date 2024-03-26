@@ -15,7 +15,7 @@ namespace Benny_Scraper.BusinessLogic.Factory.Interfaces
         /// <exception cref="ArgumentException"></exception>
         IWebDriver CreateDriver(string url, int browser = 0, bool isHeadless = false);
 
-        Task<IWebDriver> CreateDriverAsync(string url, int browser = 0, bool isHeadless = false);
+        Task<IWebDriver> CreateDriverAsync(string url, Broswer browser = Broswer.Chrome, bool isHeadless = false);
         IWebDriver GetDriverById(int id);
 
         /// <summary>
